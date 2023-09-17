@@ -18,6 +18,7 @@ func InitServices(config configs.Config) *Services {
 		DbPassword: config.DbPassword,
 		DbName:     config.DbName,
 		DbSsl:      config.DbSsl,
+		DbUrl:      config.DbUrl,
 	})
 	if err != nil {
 		log.Printf("could not init transactionRepository: %v \n", err)

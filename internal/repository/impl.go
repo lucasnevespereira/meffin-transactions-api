@@ -16,6 +16,7 @@ type Config struct {
 	DbPassword string
 	DbName     string
 	DbSsl      string
+	DbUrl      string
 }
 
 type TransactionRepositoryImpl struct {
@@ -26,17 +27,17 @@ type TransactionRepositoryImpl struct {
 var _ TransactionRepository = (*TransactionRepositoryImpl)(nil)
 
 func NewTransactionRepository(config Config) (*TransactionRepositoryImpl, error) {
-	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		config.DbHost,
-		config.DbPort,
-		config.DbUser,
-		config.DbPassword,
-		config.DbName,
-		config.DbSsl,
-	)
+	//dsn := fmt.Sprintf(
+	//	"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+	//	config.DbHost,
+	//	config.DbPort,
+	//	config.DbUser,
+	//	config.DbPassword,
+	//	config.DbName,
+	//	config.DbSsl,
+	//)
 
-	database, err := gorm.Open(postgres.Open(dsn))
+	database, err := gorm.Open(postgres.Open(config.DbUrl))
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create postgres client")
 	}

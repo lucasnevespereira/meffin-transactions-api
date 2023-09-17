@@ -12,6 +12,7 @@ type Config struct {
 	DbPassword string
 	DbName     string
 	DbSsl      string
+	DbUrl      string
 }
 
 func Load() Config {
@@ -27,6 +28,7 @@ func Load() Config {
 	conf.DbPassword = viper.GetString("POSTGRES_PASSWORD")
 	conf.DbName = viper.GetString("POSTGRES_DB")
 	conf.DbSsl = viper.GetString("POSTGRES_SSL")
+	conf.DbUrl = viper.GetString("DATABASE_URL")
 
 	return conf
 }

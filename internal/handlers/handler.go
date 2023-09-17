@@ -52,6 +52,11 @@ func (h *Handler) GetUserTransactions(c *gin.Context) {
 		Expenses: expenses,
 	}
 
+	if response.Incomes == nil && response.Expenses == nil {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound})
+		return
+	}
+
 	c.JSON(http.StatusOK, response)
 }
 
