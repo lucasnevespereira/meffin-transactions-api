@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"gorm.io/gorm"
 	"meffin-transactions-api/internal/models"
 	"meffin-transactions-api/internal/repository"
 )
@@ -9,6 +10,8 @@ import (
 type TransactionService interface {
 	Create(ctx context.Context, request models.CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactions(ctx context.Context, userId string) ([]*models.Transaction, error)
+	DeleteTransaction(ctx context.Context, transactionID uint) error
+	UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error)
 }
 
 type TransactionServiceImpl struct {
@@ -59,6 +62,39 @@ func (s *TransactionServiceImpl) GetUserTransactions(ctx context.Context, userID
 	}
 
 	return toTransactions(rowTransactions), nil
+}
+
+func (s *TransactionServiceImpl) DeleteTransaction(ctx context.Context, transactionID uint) error {
+	return s.repository.DeleteTransaction(ctx, transactionID)
+}
+
+func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error) {
+	updatedTransaction, err := s.repository.UpdateTransaction(ctx, &repository.RowTransaction{
+		Model:       gorm.Model{ID: transaction.ID},
+		UserID:      transaction.UserID,
+		Type:        transaction.Type,
+		Description: transaction.Description,
+		Amount:      transaction.Amount,
+		IsFixed:     transaction.IsFixed,
+		DayOfMonth:  transaction.DayOfMonth,
+		EndDate:     transaction.EndDate,
+		Category:    transaction.Category,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Transaction{
+		ID:          updatedTransaction.ID,
+		UserID:      updatedTransaction.UserID,
+		Type:        updatedTransaction.Type,
+		Description: updatedTransaction.Description,
+		Amount:      updatedTransaction.Amount,
+		IsFixed:     updatedTransaction.IsFixed,
+		DayOfMonth:  updatedTransaction.DayOfMonth,
+		EndDate:     updatedTransaction.EndDate,
+		Category:    updatedTransaction.Category,
+	}, nil
 }
 
 func toTransactions(rowTransactions []*repository.RowTransaction) []*models.Transaction {

@@ -77,3 +77,19 @@ func (r *TransactionRepositoryImpl) GetTransactionsByUserID(ctx context.Context,
 
 	return rowTransactions, nil
 }
+
+func (r *TransactionRepositoryImpl) DeleteTransaction(ctx context.Context, transactionID uint) error {
+	result := r.db.WithContext(ctx).Delete(&RowTransaction{}, transactionID)
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete transaction: %v", result.Error)
+	}
+	return nil
+}
+
+func (r *TransactionRepositoryImpl) UpdateTransaction(ctx context.Context, updatedTransaction *RowTransaction) (*RowTransaction, error) {
+	result := r.db.WithContext(ctx).Model(updatedTransaction).Updates(updatedTransaction)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to update transaction: %v", result.Error)
+	}
+	return updatedTransaction, nil
+}

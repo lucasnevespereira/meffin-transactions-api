@@ -9,6 +9,8 @@ type TransactionRepository interface {
 	AutoMigrate() error
 	Create(ctx context.Context, rowServer *RowTransaction) (*RowTransaction, error)
 	GetTransactionsByUserID(ctx context.Context, userID string) ([]*RowTransaction, error)
+	DeleteTransaction(ctx context.Context, transactionID uint) error
+	UpdateTransaction(ctx context.Context, updatedTransaction *RowTransaction) (*RowTransaction, error)
 }
 
 type RowTransaction struct {

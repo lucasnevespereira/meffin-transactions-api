@@ -15,7 +15,10 @@ func Setup(router *gin.Engine, services *services.Services) {
 
 	router.GET("/health", handlers.Health)
 	router.GET("/users/:user_id/transactions", h.GetUserTransactions)
+
 	router.POST("/transactions", h.CreateTransaction)
+	router.PUT("/transactions", h.UpdateTransaction)
+	router.DELETE("/transactions/:transaction_id", h.DeleteTransaction)
 
 	router.NoRoute(handlers.NoRoute)
 }
