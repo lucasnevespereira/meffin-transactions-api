@@ -38,14 +38,14 @@ func (h *Handler) GetUserTransactions(c *gin.Context) {
 }
 
 func (h *Handler) CreateTransaction(c *gin.Context) {
-	var transaction models.Transaction
+	var request models.CreateTransactionRequest
 
-	if err := c.ShouldBindJSON(&transaction); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdTransaction, err := h.transactionService.Create(c, transaction)
+	createdTransaction, err := h.transactionService.Create(c, request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction"})
 		return
