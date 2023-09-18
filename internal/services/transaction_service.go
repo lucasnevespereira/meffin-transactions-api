@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
-	"github.com/google/uuid"
+	"fmt"
 	"meffin-transactions-api/internal/models"
 	"meffin-transactions-api/internal/repository"
+	"strconv"
 	"time"
 )
 
@@ -30,13 +31,12 @@ func NewTransactionService(transactionRepository repository.TransactionRepositor
 
 func (s *TransactionServiceImpl) Create(ctx context.Context, request models.CreateTransactionRequest) (*models.Transaction, error) {
 	createdTransaction, err := s.repository.Create(ctx, &repository.RowTransaction{
-		ID:          uuid.New().String(),
 		UserID:      request.UserID,
 		Type:        request.Type,
 		Description: request.Description,
 		Amount:      request.Amount,
 		IsFixed:     request.IsFixed,
-		DayOfMonth:  request.DayOfMonth,
+		DayOfMonth:  int64(request.DayOfMonth),
 		EndDate:     request.EndDate,
 		Category:    request.Category,
 	})
@@ -45,13 +45,13 @@ func (s *TransactionServiceImpl) Create(ctx context.Context, request models.Crea
 	}
 
 	return &models.Transaction{
-		ID:          createdTransaction.ID,
+		ID:          strconv.FormatInt(createdTransaction.ID, 10),
 		UserID:      createdTransaction.UserID,
 		Type:        createdTransaction.Type,
 		Description: createdTransaction.Description,
 		Amount:      createdTransaction.Amount,
 		IsFixed:     createdTransaction.IsFixed,
-		DayOfMonth:  createdTransaction.DayOfMonth,
+		DayOfMonth:  int(createdTransaction.DayOfMonth),
 		EndDate:     createdTransaction.EndDate,
 		Category:    createdTransaction.Category,
 	}, nil
@@ -67,18 +67,26 @@ func (s *TransactionServiceImpl) GetUserTransactions(ctx context.Context, userID
 }
 
 func (s *TransactionServiceImpl) DeleteTransaction(ctx context.Context, transactionID string) error {
-	return s.repository.DeleteTransaction(ctx, transactionID)
+	id, err := strconv.ParseInt(transactionID, 10, 64)
+	if err != nil {
+		return fmt.Errorf("invalid transaction ID: %v", err)
+	}
+	return s.repository.DeleteTransaction(ctx, id)
 }
 
 func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error) {
+	transactionID, err := strconv.ParseInt(transaction.ID, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid transaction ID: %v", err)
+	}
 	updatedTransaction, err := s.repository.UpdateTransaction(ctx, &repository.RowTransaction{
-		ID:          transaction.ID,
+		ID:          transactionID,
 		UserID:      transaction.UserID,
 		Type:        transaction.Type,
 		Description: transaction.Description,
 		Amount:      transaction.Amount,
 		IsFixed:     transaction.IsFixed,
-		DayOfMonth:  transaction.DayOfMonth,
+		DayOfMonth:  int64(transaction.DayOfMonth),
 		EndDate:     transaction.EndDate,
 		Category:    transaction.Category,
 		UpdatedAt:   time.Now(),
@@ -88,13 +96,13 @@ func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transact
 	}
 
 	return &models.Transaction{
-		ID:          updatedTransaction.ID,
+		ID:          strconv.FormatInt(updatedTransaction.ID, 10),
 		UserID:      updatedTransaction.UserID,
 		Type:        updatedTransaction.Type,
 		Description: updatedTransaction.Description,
 		Amount:      updatedTransaction.Amount,
 		IsFixed:     updatedTransaction.IsFixed,
-		DayOfMonth:  updatedTransaction.DayOfMonth,
+		DayOfMonth:  int(updatedTransaction.DayOfMonth),
 		EndDate:     updatedTransaction.EndDate,
 		Category:    updatedTransaction.Category,
 	}, nil
@@ -105,13 +113,13 @@ func toTransactions(rowTransactions []*repository.RowTransaction) []*models.Tran
 
 	for _, rowTransaction := range rowTransactions {
 		transactions = append(transactions, &models.Transaction{
-			ID:          rowTransaction.ID,
+			ID:          strconv.FormatInt(rowTransaction.ID, 10),
 			UserID:      rowTransaction.UserID,
 			Type:        rowTransaction.Type,
 			Description: rowTransaction.Description,
 			Amount:      rowTransaction.Amount,
 			IsFixed:     rowTransaction.IsFixed,
-			DayOfMonth:  rowTransaction.DayOfMonth,
+			DayOfMonth:  int(rowTransaction.DayOfMonth),
 			EndDate:     rowTransaction.EndDate,
 			Category:    rowTransaction.Category,
 		})
