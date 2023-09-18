@@ -12,13 +12,7 @@ type Services struct {
 
 func InitServices(config configs.Config) *Services {
 	transactionRepository, err := repository.NewTransactionRepository(repository.Config{
-		DbHost:     config.DbHost,
-		DbPort:     config.DbPort,
-		DbUser:     config.DbUser,
-		DbPassword: config.DbPassword,
-		DbName:     config.DbName,
-		DbSsl:      config.DbSsl,
-		DbUrl:      config.DbUrl,
+		DbUrl: config.DbUrl,
 	})
 	if err != nil {
 		log.Printf("could not init transactionRepository: %v \n", err)

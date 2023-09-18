@@ -2,15 +2,16 @@ package services
 
 import (
 	"context"
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 	"meffin-transactions-api/internal/models"
 	"meffin-transactions-api/internal/repository"
+	"time"
 )
 
 type TransactionService interface {
 	Create(ctx context.Context, request models.CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactions(ctx context.Context, userId string) ([]*models.Transaction, error)
-	DeleteTransaction(ctx context.Context, transactionID uint) error
+	DeleteTransaction(ctx context.Context, transactionID string) error
 	UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error)
 }
 
@@ -29,6 +30,7 @@ func NewTransactionService(transactionRepository repository.TransactionRepositor
 
 func (s *TransactionServiceImpl) Create(ctx context.Context, request models.CreateTransactionRequest) (*models.Transaction, error) {
 	createdTransaction, err := s.repository.Create(ctx, &repository.RowTransaction{
+		ID:          uuid.New().String(),
 		UserID:      request.UserID,
 		Type:        request.Type,
 		Description: request.Description,
@@ -64,13 +66,13 @@ func (s *TransactionServiceImpl) GetUserTransactions(ctx context.Context, userID
 	return toTransactions(rowTransactions), nil
 }
 
-func (s *TransactionServiceImpl) DeleteTransaction(ctx context.Context, transactionID uint) error {
+func (s *TransactionServiceImpl) DeleteTransaction(ctx context.Context, transactionID string) error {
 	return s.repository.DeleteTransaction(ctx, transactionID)
 }
 
 func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error) {
 	updatedTransaction, err := s.repository.UpdateTransaction(ctx, &repository.RowTransaction{
-		Model:       gorm.Model{ID: transaction.ID},
+		ID:          transaction.ID,
 		UserID:      transaction.UserID,
 		Type:        transaction.Type,
 		Description: transaction.Description,
@@ -79,6 +81,7 @@ func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transact
 		DayOfMonth:  transaction.DayOfMonth,
 		EndDate:     transaction.EndDate,
 		Category:    transaction.Category,
+		UpdatedAt:   time.Now(),
 	})
 	if err != nil {
 		return nil, err

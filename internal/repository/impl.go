@@ -10,13 +10,7 @@ import (
 )
 
 type Config struct {
-	DbHost     string
-	DbPort     int
-	DbUser     string
-	DbPassword string
-	DbName     string
-	DbSsl      string
-	DbUrl      string
+	DbUrl string
 }
 
 type TransactionRepositoryImpl struct {
@@ -27,16 +21,6 @@ type TransactionRepositoryImpl struct {
 var _ TransactionRepository = (*TransactionRepositoryImpl)(nil)
 
 func NewTransactionRepository(config Config) (*TransactionRepositoryImpl, error) {
-	//dsn := fmt.Sprintf(
-	//	"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-	//	config.DbHost,
-	//	config.DbPort,
-	//	config.DbUser,
-	//	config.DbPassword,
-	//	config.DbName,
-	//	config.DbSsl,
-	//)
-
 	database, err := gorm.Open(postgres.Open(config.DbUrl))
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create postgres client")
@@ -79,7 +63,7 @@ func (r *TransactionRepositoryImpl) GetTransactionsByUserID(ctx context.Context,
 	return rowTransactions, nil
 }
 
-func (r *TransactionRepositoryImpl) DeleteTransaction(ctx context.Context, transactionID uint) error {
+func (r *TransactionRepositoryImpl) DeleteTransaction(ctx context.Context, transactionID string) error {
 	result := r.db.WithContext(ctx).Delete(&RowTransaction{}, transactionID)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete transaction: %v", result.Error)

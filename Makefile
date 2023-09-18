@@ -18,8 +18,8 @@ mocks: clean deps
 test: mocks
 	go test -v ./...
 
-run:
+run-dev:
 	docker-compose up
 
-build:
+build-dev:
 	docker-compose up --build

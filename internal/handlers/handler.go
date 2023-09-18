@@ -5,7 +5,6 @@ import (
 	"meffin-transactions-api/internal/models"
 	"meffin-transactions-api/internal/services"
 	"net/http"
-	"strconv"
 )
 
 type Handler struct {
@@ -80,13 +79,7 @@ func (h *Handler) CreateTransaction(c *gin.Context) {
 func (h *Handler) DeleteTransaction(c *gin.Context) {
 	transactionID := c.Param("transaction_id")
 
-	parsedTransactionID, err := strconv.ParseUint(transactionID, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction ID"})
-		return
-	}
-
-	err = h.transactionService.DeleteTransaction(c, uint(parsedTransactionID))
+	err := h.transactionService.DeleteTransaction(c, transactionID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete transaction"})
 		return
