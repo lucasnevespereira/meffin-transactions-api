@@ -55,7 +55,7 @@ func (r *TransactionRepositoryImpl) Create(ctx context.Context, rowTransaction *
 
 func (r *TransactionRepositoryImpl) GetTransactionsByUserID(ctx context.Context, userId string) ([]*RowTransaction, error) {
 	var rowTransactions []*RowTransaction
-	result := r.db.WithContext(ctx).Find(&rowTransactions).Where("userId = ?", userId)
+	result := r.db.WithContext(ctx).Where("user_id = ?", userId).Find(&rowTransactions)
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to get transactions: %v", result.Error)
 	}

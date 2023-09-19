@@ -14,17 +14,17 @@ type TransactionRepository interface {
 }
 
 type RowTransaction struct {
-	ID          int64     `json:"id"`
-	UserID      string    `json:"userId"`
-	Type        string    `json:"type"`
-	Description string    `json:"description"`
-	Amount      float64   `json:"amount"`
-	IsFixed     bool      `json:"is_fixed"`
-	DayOfMonth  int64     `json:"day_of_month"`
-	EndDate     string    `json:"endDate"`
-	Category    string    `json:"category"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          int64     `db:"id"`
+	UserID      string    `db:"user_id"`
+	Type        string    `db:"type"`
+	Description string    `db:"description"`
+	Amount      float64   `db:"amount"`
+	IsFixed     bool      `db:"is_fixed"`
+	DayOfMonth  int64     `db:"day_of_month"`
+	EndDate     string    `db:"endDate"`
+	Category    string    `db:"category"`
+	CreatedAt   time.Time `db:"createdAt"`
+	UpdatedAt   time.Time `db:"updatedAt"`
 }
 
 func (RowTransaction) TableName() string {
