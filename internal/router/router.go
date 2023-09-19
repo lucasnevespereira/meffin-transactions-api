@@ -19,6 +19,7 @@ func Setup(router *gin.Engine, services *services.Services) {
 	router.POST("/transactions", h.CreateTransaction)
 	router.PUT("/transactions", h.UpdateTransaction)
 	router.DELETE("/transactions/:transaction_id", h.DeleteTransaction)
+	router.DELETE("/transactions/expired", h.DeleteExpiredTransactions)
 
 	router.NoRoute(handlers.NoRoute)
 }

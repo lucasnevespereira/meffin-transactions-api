@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 type Config struct {
@@ -77,4 +78,18 @@ func (r *TransactionRepositoryImpl) UpdateTransaction(ctx context.Context, updat
 		return nil, fmt.Errorf("failed to update transaction: %v", result.Error)
 	}
 	return updatedTransaction, nil
+}
+
+func (r *TransactionRepositoryImpl) DeleteExpiredTransactions(ctx context.Context) error {
+	currentDateString := time.Now().Format("2006-01-02")
+
+	result := r.db.WithContext(ctx).
+		Where("end_date <= ? AND end_date <> ''", currentDateString).
+		Delete(&RowTransaction{})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete expired transactions: %v", result.Error)
+	}
+
+	return nil
 }

@@ -13,6 +13,7 @@ type TransactionService interface {
 	Create(ctx context.Context, request models.CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactions(ctx context.Context, userId string) ([]*models.Transaction, error)
 	DeleteTransaction(ctx context.Context, transactionID string) error
+	DeleteExpiredTransactions(ctx context.Context) error
 	UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error)
 }
 
@@ -72,6 +73,10 @@ func (s *TransactionServiceImpl) DeleteTransaction(ctx context.Context, transact
 		return fmt.Errorf("invalid transaction ID: %v", err)
 	}
 	return s.repository.DeleteTransaction(ctx, id)
+}
+
+func (s *TransactionServiceImpl) DeleteExpiredTransactions(ctx context.Context) error {
+	return s.repository.DeleteExpiredTransactions(ctx)
 }
 
 func (s *TransactionServiceImpl) UpdateTransaction(ctx context.Context, transaction *models.Transaction) (*models.Transaction, error) {
