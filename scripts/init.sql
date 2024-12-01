@@ -1,4 +1,5 @@
 CREATE SEQUENCE transactions_id_seq;
+CREATE SEQUENCE categories_id_seq;
 
 CREATE TABLE transactions
 (
@@ -14,6 +15,16 @@ CREATE TABLE transactions
     day_of_month BIGINT,
     end_date     TEXT,
     category     TEXT,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE categories
+(
+    id         BIGINT NOT NULL          DEFAULT nextval('categories_id_seq'),
+    user_id    TEXT,
+    type      TEXT,
+    name       TEXT,
+    color      TEXT,
     PRIMARY KEY (id)
 );
 

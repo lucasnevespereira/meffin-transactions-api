@@ -8,22 +8,24 @@ import (
 
 type Services struct {
 	TransactionService TransactionService
+	CategoryService    ICategoryService
 }
 
 func InitServices(config configs.Config) *Services {
-	transactionRepository, err := repository.NewTransactionRepository(repository.Config{
+	repo, err := repository.NewRepository(repository.Config{
 		DbUrl: config.DbUrl,
 	})
 	if err != nil {
 		log.Printf("could not init transactionRepository: %v \n", err)
 	}
-	err = transactionRepository.AutoMigrate()
+	err = repo.AutoMigrate()
 	if err != nil {
 		log.Printf("could not auto migrate transactionRepository: %v \n", err)
 	}
 
 	return &Services{
-		TransactionService: NewTransactionService(transactionRepository),
+		CategoryService:    NewCategoryService(repo),
+		TransactionService: NewTransactionService(repo),
 	}
 
 }

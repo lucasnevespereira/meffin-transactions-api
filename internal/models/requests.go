@@ -8,5 +8,12 @@ type CreateTransactionRequest struct {
 	IsFixed     bool    `json:"is_fixed"`
 	DayOfMonth  int     `json:"day_of_month"`
 	EndDate     string  `json:"endDate"`
-	Category    string  `json:"category"`
+	CategoryID  string  `json:"category"`
+}
+
+type CreateCategoryRequest struct {
+	UserID string `json:"userId"`
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Color  string `json:"color"`
 }

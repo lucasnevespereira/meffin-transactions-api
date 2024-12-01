@@ -1,18 +1,23 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
 	"meffin-transactions-api/internal/models"
 	"meffin-transactions-api/internal/services"
 	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
+	categoryService    services.ICategoryService
 	transactionService services.TransactionService
 }
 
-func NewHandler(transactionService services.TransactionService) *Handler {
+func NewHandler(transactionService services.TransactionService, categoryService services.ICategoryService) *Handler {
 	return &Handler{
+		categoryService:    categoryService,
 		transactionService: transactionService,
 	}
 }
@@ -90,6 +95,8 @@ func (h *Handler) DeleteTransaction(c *gin.Context) {
 
 func (h *Handler) DeleteExpiredTransactions(c *gin.Context) {
 
+	log.Printf("Webhook: Deleting expired transactions, date: %s", time.Now().Format(time.RFC3339))
+
 	err := h.transactionService.DeleteExpiredTransactions(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete expired transactions"})
@@ -114,4 +121,67 @@ func (h *Handler) UpdateTransaction(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updatedTransaction)
+}
+
+func (h *Handler) CreateCategory(c *gin.Context) {
+	var request models.CreateCategoryRequest
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	createdCategory, err := h.categoryService.Create(c, request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create category"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdCategory)
+}
+
+func (h *Handler) GetUserCategories(c *gin.Context) {
+	userID := c.Param("user_id")
+
+	categories, err := h.categoryService.GetUserCategories(c, userID)
+	if categories == nil {
+		c.JSON(http.StatusOK, gin.H{"message": "No categories found for the user"})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching categories for the user."})
+		return
+	}
+
+	c.JSON(http.StatusOK, categories)
+}
+
+func (h *Handler) DeleteCategory(c *gin.Context) {
+	categoryID := c.Param("category_id")
+
+	err := h.categoryService.DeleteCategory(c, categoryID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete category"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
+}
+
+func (h *Handler) UpdateCategory(c *gin.Context) {
+	var request models.Category
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedCategory, err := h.categoryService.UpdateCategory(c, &request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedCategory)
 }

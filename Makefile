@@ -1,7 +1,5 @@
-.PHONY: lint build run test clean deps mocks
+.PHONY: lint build run test clean deps mocks proxy-db connect-db deploy run-dev
 
-fly-db-proxy:
-	flyctl proxy 5432 -a meffin-transactions-api-db
 
 lint:
 	golangci-lint run --exclude-use-default=true
@@ -23,3 +21,12 @@ run-dev:
 
 build-dev:
 	docker-compose up --build
+
+proxy-db:
+	fly proxy 5432 -a meffin-transactions-api-db
+
+connect-db:
+	fly postgres connect -a meffin-transactions-api-db
+
+deploy:
+	flyctl deploy

@@ -18,13 +18,13 @@ type TransactionService interface {
 }
 
 type TransactionServiceImpl struct {
-	repository repository.TransactionRepository
+	repository repository.IRepository
 }
 
 // Enforces implementation of interface at compile time
 var _ TransactionService = (*TransactionServiceImpl)(nil)
 
-func NewTransactionService(transactionRepository repository.TransactionRepository) *TransactionServiceImpl {
+func NewTransactionService(transactionRepository repository.IRepository) *TransactionServiceImpl {
 	return &TransactionServiceImpl{
 		repository: transactionRepository,
 	}
@@ -39,7 +39,7 @@ func (s *TransactionServiceImpl) Create(ctx context.Context, request models.Crea
 		IsFixed:     request.IsFixed,
 		DayOfMonth:  int64(request.DayOfMonth),
 		EndDate:     request.EndDate,
-		Category:    request.Category,
+		Category:    request.CategoryID,
 	})
 	if err != nil {
 		return nil, err
